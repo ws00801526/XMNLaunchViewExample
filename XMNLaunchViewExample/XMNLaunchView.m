@@ -39,6 +39,16 @@
 
 @implementation XMNLaunchView
 
+- (instancetype)initWithFrame:(CGRect)frame {
+    
+    return [self initWithWindow:[UIApplication sharedApplication].keyWindow imageURL:nil];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    
+    return [self initWithWindow:[UIApplication sharedApplication].keyWindow imageURL:nil];
+}
+
 - (instancetype)initWithWindow:(UIWindow *)window
                       imageURL:(NSURL *)imageURL {
     
@@ -71,7 +81,6 @@
     return self;
 }
 
-
 - (void)dealloc {
     
     NSLog(@"%@  dealloc",NSStringFromClass([self class]));
@@ -99,7 +108,7 @@
         [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeRequestOverTime];
     }else {
         __weak typeof(*&self) wSelf = self;
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             
             __strong typeof(*&wSelf) self = wSelf;
             [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeRequestOverTime];
@@ -116,11 +125,8 @@
         [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeDisplayOverTime];
     }else {
         __weak typeof(*&self) wSelf = self;
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            
+        dispatch_async(dispatch_get_main_queue(), ^{
             __strong typeof(*&wSelf) self = wSelf;
-            self.timer ? [self.timer invalidate] : nil;
-            self.skipButton.hidden = YES;
             [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeDisplayOverTime];
         });
     }
@@ -134,7 +140,7 @@
 - (void)handleSkipAction:(UIButton *)button {
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleDisplayImageTimeOut) object:nil];
-    [self dismissLaunchViewWithMode:button.tag];
+    [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeSkip];
 }
 
 - (void)handleTimerAction {
@@ -149,14 +155,17 @@
 
 - (void)dismissLaunchViewWithMode:(XMNLaunchViewDismissMode)mode {
     
+    self.timer ? [self.timer invalidate] : nil;
+    self.skipButton.hidden = YES;
+    
     [UIView animateWithDuration:.5f animations:^{
         
         self.imageView.alpha = 0.3f;
         self.imageView.transform = CGAffineTransformMakeScale(1.5f, 1.5f);
     } completion:^(BOOL finished) {
         
-        [self removeFromSuperview];
         self.completedBlock ? self.completedBlock(mode) : nil;
+        [self removeFromSuperview];
     }];
 }
 
@@ -180,6 +189,7 @@
                 }else {
                     self.imageView.image = [image yy_imageByResizeToSize:self.bounds.size];
                 }
+
                 [UIView animateWithDuration:.15f animations:^{
                     self.imageView.alpha = 1.f;
                 } completion:^(BOOL finished) {
@@ -195,6 +205,10 @@
                 [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeRequestOverTime];
             }
         }];
+    }else {
+        
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleRequestImageTimeOut) object:nil];
+        [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeSkip];
     }
 }
 
@@ -213,8 +227,8 @@
     if (self.imageView.image) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(handleDisplayImageTimeOut) object:nil];
         [self performSelector:@selector(handleDisplayImageTimeOut) withObject:nil afterDelay:imageDisplayInerval];
-        [self.skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)self.imageDisplayInerval] forState:UIControlStateNormal];
     }
+    [self.skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)self.imageDisplayInerval] forState:UIControlStateNormal];
 }
 
 #pragma mark - Getter
@@ -231,7 +245,8 @@
             launchImageName = dict[@"UILaunchImageName"];
         }
     }
-    return [UIImage imageNamed:launchImageName];
+
+    return launchImageName ? [UIImage imageNamed:launchImageName] : nil;
 }
 
 - (UIButton *)skipButton {

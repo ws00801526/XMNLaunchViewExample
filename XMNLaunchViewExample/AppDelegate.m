@@ -43,7 +43,13 @@
     
     XMNLaunchView *view = [[XMNLaunchView alloc] initWithWindow:self.window
                                                        imageURL:imageURL];
-    view.imageTimeoutInterval = 20.f;
+    
+    /** 使用initWithFrame方法初始化 */
+//    XMNLaunchView *view = [[XMNLaunchView alloc] initWithFrame:CGRectZero];
+    /** 使用initWithCoder方法初始化 */
+//    XMNLaunchView *view = [[XMNLaunchView alloc] initWithCoder:nil];
+    
+//    view.imageTimeoutInterval = 5.f;
     [view setCompletedBlock:^(XMNLaunchViewDismissMode mode) {
         
     }];

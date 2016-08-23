@@ -32,13 +32,23 @@ typedef NS_ENUM(NSUInteger, XMNLaunchViewDismissMode) {
 /** 图片超时时长,如果图片长时间未获取成功,则直接去下此页面  默认10s    */
 @property (assign, nonatomic) NSTimeInterval imageTimeoutInterval;
 
+/** 回调block */
+@property (copy, nonatomic, nullable)   void(^completedBlock)(XMNLaunchViewDismissMode tag);
 
-@property (copy, nonatomic)   void(^completedBlock)(XMNLaunchViewDismissMode tag);
+/** 显示的图片地址 */
+@property (strong, nonatomic, readonly, nullable) NSURL *imageURL;
+/** 显示launchView的主window */
+@property (weak, nonatomic, readonly, nullable)   UIWindow *window;
 
-@property (strong, nonatomic, readonly) NSURL *imageURL;
-@property (weak, nonatomic, readonly)   UIWindow *window;
-
-- (instancetype)initWithWindow:(UIWindow *)window
-                      imageURL:(NSURL *)imageURL;
+/**
+ *  @brief 指定初始化方法
+ *
+ *  @param window   显示launchView的主window
+ *  @param imageURL 显示的图片地址
+ *
+ *  @return
+ */
+- (instancetype _Nonnull)initWithWindow:(UIWindow * _Nonnull)window
+                               imageURL:(NSURL * _Nullable)imageURL NS_DESIGNATED_INITIALIZER;
 
 @end
