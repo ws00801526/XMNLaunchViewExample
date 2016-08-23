@@ -39,16 +39,6 @@
 
 @implementation XMNLaunchView
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    
-    return [self initWithWindow:[UIApplication sharedApplication].keyWindow imageURL:nil];
-}
-
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    
-    return [self initWithWindow:[UIApplication sharedApplication].keyWindow imageURL:nil];
-}
-
 - (instancetype)initWithWindow:(UIWindow *)window
                       imageURL:(NSURL *)imageURL {
     

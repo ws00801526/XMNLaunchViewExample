@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, XMNLaunchViewDismissMode) {
 @property (assign, nonatomic) NSTimeInterval imageTimeoutInterval;
 
 /** 回调block */
-@property (copy, nonatomic, nullable)   void(^completedBlock)(XMNLaunchViewDismissMode tag);
+@property (copy, nonatomic, nullable)   void(^completedBlock)(XMNLaunchViewDismissMode mode);
 
 /** 显示的图片地址 */
 @property (strong, nonatomic, readonly, nullable) NSURL *imageURL;
@@ -50,5 +50,9 @@ typedef NS_ENUM(NSUInteger, XMNLaunchViewDismissMode) {
  */
 - (instancetype _Nonnull)initWithWindow:(UIWindow * _Nonnull)window
                                imageURL:(NSURL * _Nullable)imageURL NS_DESIGNATED_INITIALIZER;
+
+- (instancetype __nonnull)initWithFrame:(CGRect)frame NS_UNAVAILABLE;
+
+- (instancetype __nonnull)initWithCoder:(NSCoder * __nonnull)aDecoder NS_UNAVAILABLE;
 
 @end
