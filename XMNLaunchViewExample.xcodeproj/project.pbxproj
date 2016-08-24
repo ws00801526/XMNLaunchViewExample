@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		973B930C1D6C4AF0001C3E68 /* XMNLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 973B930B1D6C4AF0001C3E68 /* XMNLaunchView.swift */; };
 		97C03C321D6AE8D20062C3FB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C311D6AE8D20062C3FB /* main.m */; };
 		97C03C351D6AE8D20062C3FB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C341D6AE8D20062C3FB /* AppDelegate.m */; };
 		97C03C381D6AE8D20062C3FB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C371D6AE8D20062C3FB /* ViewController.m */; };
@@ -38,6 +39,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		973B930A1D6C4AF0001C3E68 /* XMNLaunchViewExample-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "XMNLaunchViewExample-Bridging-Header.h"; sourceTree = "<group>"; };
+		973B930B1D6C4AF0001C3E68 /* XMNLaunchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XMNLaunchView.swift; sourceTree = "<group>"; };
 		97C03C2D1D6AE8D20062C3FB /* XMNLaunchViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XMNLaunchViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97C03C311D6AE8D20062C3FB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		97C03C331D6AE8D20062C3FB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -132,6 +135,7 @@
 				97C03C371D6AE8D20062C3FB /* ViewController.m */,
 				97C03C471D6AE8F50062C3FB /* XMNLaunchView.h */,
 				97C03C481D6AE8F50062C3FB /* XMNLaunchView.m */,
+				973B930B1D6C4AF0001C3E68 /* XMNLaunchView.swift */,
 				97C03C8D1D6B04C30062C3FB /* qidong.gif */,
 				97C03C4E1D6AEF800062C3FB /* YYWebImage */,
 				97C03C391D6AE8D20062C3FB /* Main.storyboard */,
@@ -139,6 +143,7 @@
 				97C03C3E1D6AE8D20062C3FB /* LaunchScreen.storyboard */,
 				97C03C411D6AE8D20062C3FB /* Info.plist */,
 				97C03C301D6AE8D20062C3FB /* Supporting Files */,
+				973B930A1D6C4AF0001C3E68 /* XMNLaunchViewExample-Bridging-Header.h */,
 			);
 			path = XMNLaunchViewExample;
 			sourceTree = "<group>";
@@ -299,6 +304,7 @@
 				97C03C801D6AEF800062C3FB /* UIImageView+YYWebImage.m in Sources */,
 				97C03C7E1D6AEF800062C3FB /* UIButton+YYWebImage.m in Sources */,
 				97C03C7B1D6AEF800062C3FB /* _YYWebImageSetter.m in Sources */,
+				973B930C1D6C4AF0001C3E68 /* XMNLaunchView.swift in Sources */,
 				97C03C351D6AE8D20062C3FB /* AppDelegate.m in Sources */,
 				97C03C821D6AEF800062C3FB /* YYFrameImage.m in Sources */,
 				97C03C811D6AEF800062C3FB /* YYAnimatedImageView.m in Sources */,
@@ -424,10 +430,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = XMNLaunchViewExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.XMFraker.XMNLaunchViewExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "XMNLaunchViewExample/XMNLaunchViewExample-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -436,10 +445,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = XMNLaunchViewExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.XMFraker.XMNLaunchViewExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "XMNLaunchViewExample/XMNLaunchViewExample-Bridging-Header.h";
 			};
 			name = Release;
 		};

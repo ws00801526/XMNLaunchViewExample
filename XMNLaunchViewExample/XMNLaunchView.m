@@ -18,9 +18,6 @@
 /** 启动图,从Assets中获取 */
 @property (strong, nonatomic, readonly) UIImage *launchImage;
 
-@property (strong, nonatomic) NSURL *imageURL;
-@property (weak, nonatomic)   UIWindow *window;
-
 /** 跳过按钮 */
 @property (strong, nonatomic) UIButton *skipButton;
 
@@ -48,6 +45,7 @@
         self.imageDisplayInerval = 3.f;
         self.imageTimeoutInterval = 10.f;
         
+        /** 注意此处 要先调用window makeKeyAndVisible 将window.rootViewController.view渲染出来 */
         self.window = window;
         [self.window makeKeyAndVisible];
         
@@ -180,7 +178,8 @@
                     self.imageView.image = [image yy_imageByResizeToSize:self.bounds.size];
                 }
 
-                [UIView animateWithDuration:.15f animations:^{
+                self.imageView.alpha = .0f;
+                [UIView animateWithDuration:.3f animations:^{
                     self.imageView.alpha = 1.f;
                 } completion:^(BOOL finished) {
                     self.startDate = [NSDate date];
@@ -247,6 +246,8 @@
         _skipButton.layer.cornerRadius = 15.f;
         _skipButton.frame = CGRectMake(self.bounds.size.width - 16 - 60, 32, 60, 30);
         _skipButton.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:.5f];
+        
+        
         _skipButton.tag = XMNLaunchViewDismissModeSkip;
         [_skipButton.titleLabel setFont:[UIFont systemFontOfSize:12.f]];
         [_skipButton addTarget:self action:@selector(handleSkipAction:) forControlEvents:UIControlEventTouchUpInside];

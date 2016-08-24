@@ -36,9 +36,10 @@ typedef NS_ENUM(NSUInteger, XMNLaunchViewDismissMode) {
 @property (copy, nonatomic, nullable)   void(^completedBlock)(XMNLaunchViewDismissMode mode);
 
 /** 显示的图片地址 */
-@property (strong, nonatomic, readonly, nullable) NSURL *imageURL;
+@property (strong, nonatomic, nullable) NSURL *imageURL;
+
 /** 显示launchView的主window */
-@property (weak, nonatomic, readonly, nullable)   UIWindow *window;
+@property (weak, nonatomic, nullable)   UIWindow *window;
 
 /**
  *  @brief 指定初始化方法
