@@ -42,6 +42,9 @@
     
     NSURL *imageURL = [NSURL URLWithString:@"http://img4q.duitang.com/uploads/item/201405/31/20140531174231_cA3VQ.jpeg"];
     
+    /** 加载图片失败的地址 */
+//    imageURL = [NSURL URLWithString:@"http://failed.png"];
+    
     /** 本地图片 */
 //    imageURL = [[NSBundle mainBundle] URLForResource:@"qidong" withExtension:@"gif"];
     
@@ -69,12 +72,11 @@
     XMNLaunchView *view = [[XMNLaunchView alloc] initWithWindow:self.window
                                                        imageURL:URL];
     
-    view.imageTimeoutInterval = 5.f;
-    [view setCompletedBlock:^(XMNLaunchViewDismissMode mode) {
+    [view setCompletedBlock:^(XMNLaunchView *launchView, XMNLaunchViewDismissMode mode) {
         
+        [launchView dismissLaunchView];
     }];
 }
-
 
 #else
 

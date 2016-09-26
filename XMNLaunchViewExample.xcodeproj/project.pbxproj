@@ -255,6 +255,7 @@
 				TargetAttributes = {
 					97C03C2C1D6AE8D20062C3FB = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -437,6 +438,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "XMNLaunchViewExample/XMNLaunchViewExample-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -451,6 +453,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.XMFraker.XMNLaunchViewExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "XMNLaunchViewExample/XMNLaunchViewExample-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
