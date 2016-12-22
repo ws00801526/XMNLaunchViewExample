@@ -2,183 +2,156 @@
 //  XMNLaunchView.m
 //  XMNLaunchViewExample
 //
-//  Created by XMFraker on 16/8/22.
+//  Created by XMFraker on 16/11/9.
 //  Copyright © 2016年 XMFraker. All rights reserved.
 //
 
 #import "XMNLaunchView.h"
+#import "YYAnimatedImageView.h"
 
 #import "YYWebImage.h"
+
 #import "UIImage+YYWebImage.h"
 #import "UIImageView+YYWebImage.h"
 
+
+NSInteger kXMNLaunchViewTag = 12306;
+
 @interface XMNLaunchView ()
 
-/** 跳过按钮 */
-@property (strong, nonatomic) UIButton *skipButton;
-
-/** 显示图片的imageView */
-@property (weak, nonatomic)   YYAnimatedImageView *imageView;
-
-/** 定时器 1秒执行一次 */
-@property (strong, nonatomic) NSTimer *timer;
-
-/** 记录显示图片的时间 */
-@property (strong, nonatomic) NSDate *startDate;
-
-@property (weak, nonatomic)   UIWindow *window;
-
+@property (weak, nonatomic) YYAnimatedImageView *imageView;
+@property (weak, nonatomic) UIButton *skipButton;
 @property (strong, nonatomic) YYWebImageManager *imageManager;
 
+@property (strong, nonatomic, nullable) NSURL   *imageURL;
+
+
+@property (strong, nonatomic) NSTimer *countdownTimer;
+@property (strong, nonatomic) NSDate *countdownDate;
 
 @end
 
 @implementation XMNLaunchView
-@synthesize placeholder = _placeholder;
 
-- (instancetype)initWithWindow:(UIWindow *)window
-                      imageURL:(NSURL *)imageURL {
+#pragma mark - Life Cycle
+
+- (instancetype)initWithPlaceholder:(UIImage *)placeholder
+                           imageURL:(NSURL *)imageURL {
     
-    
-    if (self = [super initWithFrame:window.bounds]) {
+    if (self = [super initWithFrame:[UIApplication sharedApplication].keyWindow.bounds]) {
         
-        self.window = window;
-        self.imageURL = imageURL;
-        [self setup];
+        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+        queue.name = @"com.XMFraker.XMNLaunchView.kXMNDownloadLaunchQueue";
+        if ([queue respondsToSelector:@selector(setQualityOfService:)]) {
+            queue.qualityOfService = NSQualityOfServiceBackground;
+        }
+        self.tag = kXMNLaunchViewTag;
+        
+        self.imageManager = [[YYWebImageManager alloc] initWithCache:[YYImageCache sharedCache] queue:queue];
+        
+        self.autoHide = YES;
+        self.displayTimeout = 3.f;
+        self.requestTimeout = 5.f;
+        self.placeholder = placeholder ? : [XMNLaunchView launchImage];
+        
         [self setupUI];
         
-        [self loadImage];
+        [self launchImageWithURL:imageURL
+                  requestTimeout:self.requestTimeout
+                  displayTimeout:self.displayTimeout];
     }
     return self;
 }
 
-- (void)dealloc {
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
     
-    NSLog(@"%@  dealloc",NSStringFromClass([self class]));
-    [self.imageView yy_cancelCurrentImageRequest];
+    return [self initWithPlaceholder:nil
+                            imageURL:nil];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    
+    return [self initWithPlaceholder:nil
+                            imageURL:nil];
 }
 
 #pragma mark - Method
 
-
-- (void)setup {
-    
-    NSOperationQueue *queue = [NSOperationQueue new];
-    if ([queue respondsToSelector:@selector(setQualityOfService:)]) {
-        queue.qualityOfService = NSQualityOfServiceBackground;
-    }
-    self.imageManager = [[YYWebImageManager alloc] initWithCache:[YYImageCache sharedCache] queue:queue];
-    self.imageManager.timeout = self.imageTimeoutInterval;
-    
-    self.imageDisplayInerval = 3.f;
-    self.imageTimeoutInterval = 5.f;
-}
-
 - (void)setupUI {
     
-    /** 注意此处 要先调用window makeKeyAndVisible 将window.rootViewController.view渲染出来 */
-    [self.window makeKeyAndVisible];
+    YYAnimatedImageView *animatedImageView = [[YYAnimatedImageView alloc] initWithFrame:self.bounds];
+    animatedImageView.autoPlayAnimatedImage = YES;
+    animatedImageView.userInteractionEnabled = NO;
+    [self addSubview:self.imageView = animatedImageView];
     
-    /** 设置默认背景为启动图图片 */
-    self.backgroundColor = [UIColor colorWithPatternImage:self.placeholder];
+    UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapLaunch)];
+    [animatedImageView addGestureRecognizer:tapGes];
     
-    /** 添加imageView */
-    YYAnimatedImageView *imageView = [[YYAnimatedImageView alloc] initWithFrame:self.bounds];
-    imageView.contentMode = UIViewContentModeScaleAspectFill;
-    imageView.userInteractionEnabled = YES;
-    imageView.tag = XMNLaunchViewDismissModeTap;
-    
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapAction:)];
-    [imageView addGestureRecognizer:tap];
-    [self addSubview:self.imageView = imageView];
-    
-    [self.window addSubview:self];
+    UIButton *skipButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)self.displayTimeout] forState:UIControlStateNormal];
+    skipButton.layer.cornerRadius = 15.f;
+    skipButton.frame = CGRectMake(self.bounds.size.width - 16 - 60, 32, 60, 30);
+    skipButton.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:.5f];
+    [skipButton.titleLabel setFont:[UIFont systemFontOfSize:12.f]];
+    [skipButton addTarget:self action:@selector(handleSkipAction:) forControlEvents:UIControlEventTouchUpInside];
+    skipButton.hidden = YES;
+    [self addSubview:self.skipButton = skipButton];
 }
 
-- (void)loadImage {
+- (void)launchImageWithURL:(NSURL *)imageURL
+            requestTimeout:(NSInteger)requestTimeout
+            displayTimeout:(NSInteger)displayTimeout {
     
-    if (self.imageURL) {
-        /** 取消之前的图片下载 */
-        [self.imageView yy_cancelCurrentImageRequest];
+    self.skipButton.hidden = YES;
+    self.requestTimeout = requestTimeout > 0 ? requestTimeout : 5.f;
+    self.displayTimeout = displayTimeout > 0 ? displayTimeout : 3.f;
     
-        __weak typeof(*&self) wSelf = self;
+    self.imageView.image = self.placeholder;
+    self.imageURL = imageURL;
+    if (imageURL) {
         
-        [self.imageView yy_setImageWithURL:self.imageURL placeholder:self.placeholder options:YYWebImageOptionSetImageWithFadeAnimation manager:self.imageManager progress:nil transform:nil completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
+        __weak typeof(*&self) wSelf = self;
+        [self.imageView yy_cancelCurrentImageRequest];
+        [self.imageView yy_setImageWithURL:imageURL placeholder:self.placeholder options:YYWebImageOptionSetImageWithFadeAnimation manager:self.imageManager progress:nil transform:^UIImage * _Nullable(UIImage * _Nonnull image, NSURL * _Nonnull url) {
+            
+            YYImage *animatedImage = (YYImage *)image;
+            if (animatedImage.animatedImageType == YYImageTypeGIF) {
+                /** gif图片不做处理 */
+                return animatedImage;
+            }else {
+                return [image yy_imageByResizeToSize:[UIApplication sharedApplication].keyWindow.bounds.size contentMode:UIViewContentModeScaleAspectFill];
+            }
+            /** 适配图片 */
+        } completion:^(UIImage * _Nullable image, NSURL * _Nonnull url, YYWebImageFromType from, YYWebImageStage stage, NSError * _Nullable error) {
             
             __strong typeof(*&wSelf) self = wSelf;
-            /** 忽略被取消的请求 */
-            if (stage == YYWebImageStageCancelled) {
-                return ;
-            }
-            
             if (image && !error) {
                 
-                YYImage *animatedImage = (YYImage *)image;
-                if (animatedImage.animatedImageType == YYImageTypeGIF) {
-                    self.imageView.animatedImage = animatedImage;
-                }else {
-                    self.imageView.image = [image yy_imageByResizeToSize:self.bounds.size];
-                }
+                /** 显示跳过按钮,开始显示倒计时 */
+                self.imageView.userInteractionEnabled = YES;
+                self.skipButton.hidden = NO;
+                self.countdownDate = [NSDate date];
+                self.countdownTimer = [NSTimer scheduledTimerWithTimeInterval:1.f
+                                                                       target:self
+                                                                     selector:@selector(handleCountdownAction)
+                                                                     userInfo:nil
+                                                                      repeats:YES];
+            }else if (self.isAutoHide){
                 
-                self.startDate = [NSDate date];
-                self.timer = [NSTimer scheduledTimerWithTimeInterval:1.f target:self selector:@selector(handleTimerAction) userInfo:nil repeats:YES];
-                [self addSubview:self.skipButton];
-                [self.imageView startAnimating];
-                self.backgroundColor = [UIColor clearColor];
-            }else {
-                [self callCompletedBlockWithMode:XMNLaunchViewDismissModeImageFailed];
+                [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeDefault];
             }
         }];
     }
 }
 
-/**
- *  @brief 处理用户点击广告imageView
- *
- *  @param tap
- */
-- (void)handleTapAction:(UITapGestureRecognizer *)tap {
-    
-    [self callCompletedBlockWithMode:XMNLaunchViewDismissModeTap];
-}
-
-
-/**
- *  @brief 处理用户点击了skip按钮
- *
- *  @param button
- */
-- (void)handleSkipAction:(UIButton *)button {
-    
-    self.timer ? [self.timer invalidate] : nil;
-    [self callCompletedBlockWithMode:XMNLaunchViewDismissModeSkip];
-}
-
-- (void)handleTimerAction {
-    
-    NSTimeInterval remainTimeInveral = MAX((int)self.imageDisplayInerval - (int)[[NSDate date] timeIntervalSinceDate:self.startDate], 0);
-    [self.skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)remainTimeInveral] forState:UIControlStateNormal];
-    
-    if (remainTimeInveral <= 0) {
-        [self callCompletedBlockWithMode:XMNLaunchViewDismissModeDisplayTimeout];
-    }
-}
-
-- (void)callCompletedBlockWithMode:(XMNLaunchViewDismissMode)mode {
-    
-    __weak typeof(*&self) wSelf = self;
-    if ([NSThread isMainThread]) {
-        self.completedBlock ? self.completedBlock(wSelf, mode) : nil;
-    }else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.completedBlock ? self.completedBlock(wSelf, mode) : nil;
-        });
-    }
-}
-
 - (void)dismissLaunchView {
+    
+    [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeDefault];
+}
 
-    self.timer ? [self.timer invalidate] : nil;
+- (void)dismissLaunchViewWithMode:(XMNLaunchViewDismissMode)mode {
+    
+    self.countdownTimer ? [self.countdownTimer invalidate] : nil;
     self.skipButton.hidden = YES;
     
     [UIView animateWithDuration:.5f animations:^{
@@ -187,58 +160,85 @@
         self.transform = CGAffineTransformMakeScale(1.5f, 1.5f);
     } completion:^(BOOL finished) {
         
-        [self removeFromSuperview];
+        switch (mode) {
+            case XMNLaunchViewDismissModeTap:
+                self.completionBlock ? self.completionBlock(self, mode) : nil;
+            default:
+                [self removeFromSuperview];
+                break;
+        }
     }];
+}
+
+#pragma mark - Events
+
+- (void)handleSkipAction:(UIButton *)button {
+    
+    [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeDefault];
+}
+
+- (void)handleTapLaunch {
+    
+    [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeTap];
+}
+
+- (void)handleCountdownAction {
+    
+    NSTimeInterval remainTimeInveral = MAX((int)self.displayTimeout - (int)[[NSDate date] timeIntervalSinceDate:self.countdownDate], 0);
+    [self.skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)remainTimeInveral] forState:UIControlStateNormal];
+    
+    if (remainTimeInveral <= 0) {
+        [self dismissLaunchViewWithMode:XMNLaunchViewDismissModeDefault];
+    }
 }
 
 #pragma mark - Setter
 
-- (void)setImageTimeoutInterval:(NSTimeInterval)imageTimeoutInterval {
-    
-    _imageTimeoutInterval = imageTimeoutInterval;
-    if (self.imageManager) {
-        self.imageManager.timeout = imageTimeoutInterval;
-    }
-    
-    /** 重新设置了timeout属性,重新加载图片 */
-    [self loadImage];
-}
-
-- (void)setImageDisplayInerval:(NSTimeInterval)imageDisplayInerval {
-    
-    _imageDisplayInerval = imageDisplayInerval;
-    [self.skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)self.imageDisplayInerval] forState:UIControlStateNormal];
-    if (self.timer) {
-        [self.timer invalidate];
-        self.startDate = [NSDate date];
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.f target:self selector:@selector(handleTimerAction) userInfo:nil repeats:YES];
-    }
-}
-
-- (void)setImageURL:(NSURL *)imageURL {
-    
-    if (imageURL && _imageURL != imageURL) {
-
-        /** 重新加载新的图片 */
-        _imageURL = imageURL;
-        [self loadImage];
-    }
-}
-
 - (void)setPlaceholder:(UIImage *)placeholder {
     
     _placeholder = placeholder;
-    [self loadImage];
+    self.imageView.image = placeholder;
+}
+
+- (void)setDisplayTimeout:(NSTimeInterval)displayTimeout {
+    
+    _displayTimeout = displayTimeout;
+    [self.skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)self.displayTimeout] forState:UIControlStateNormal];
+}
+
+- (void)setRequestTimeout:(NSTimeInterval)requestTimeout {
+    
+    self.imageManager.timeout = requestTimeout;
+}
+
+- (void)setFrame:(CGRect)frame {
+    
+    [super setFrame:frame];
+    self.imageView.frame = self.bounds;
 }
 
 #pragma mark - Getter
 
-- (UIImage *)placeholder {
+- (NSTimeInterval)requestTimeout {
     
-    if (_placeholder) {
-        return _placeholder;
-    }
+    return self.imageManager.timeout;
+}
 
+- (BOOL)isAutoHide {
+    
+    return _autoHide;
+}
+
+#pragma mark - Class Method
+
+
+/**
+ 从启动图中获取当前启动图片
+ 
+ @return 获取到的图片
+ */
++ (UIImage * __nullable)launchImage {
+    
     NSString *viewOrientation;
     switch ([UIApplication sharedApplication].statusBarOrientation) {
         case UIInterfaceOrientationLandscapeLeft:
@@ -255,27 +255,20 @@
     NSArray* imagesDict = [[[NSBundle mainBundle] infoDictionary] valueForKey:@"UILaunchImages"];
     for (NSDictionary* dict in imagesDict) {
         CGSize imageSize = CGSizeFromString(dict[@"UILaunchImageSize"]);
-        if (CGSizeEqualToSize(imageSize, self.window.bounds.size) && [viewOrientation isEqualToString:dict[@"UILaunchImageOrientation"]]) {
+        if (CGSizeEqualToSize(imageSize, [UIApplication sharedApplication].keyWindow.bounds.size) && [viewOrientation isEqualToString:dict[@"UILaunchImageOrientation"]]) {
             launchImageName = dict[@"UILaunchImageName"];
         }
     }
     return launchImageName ? [UIImage imageNamed:launchImageName] : nil;
 }
 
-- (UIButton *)skipButton {
-    
-    if (!_skipButton) {
-        _skipButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_skipButton setTitle:[NSString stringWithFormat:@"%02ds",(int)self.imageDisplayInerval] forState:UIControlStateNormal];
-        _skipButton.layer.cornerRadius = 15.f;
-        _skipButton.frame = CGRectMake(self.bounds.size.width - 16 - 60, 32, 60, 30);
-        _skipButton.backgroundColor = [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:.5f];
-        
-        _skipButton.tag = XMNLaunchViewDismissModeSkip;
-        [_skipButton.titleLabel setFont:[UIFont systemFontOfSize:12.f]];
-        [_skipButton addTarget:self action:@selector(handleSkipAction:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    return _skipButton;
-}
 
++ (XMNLaunchView * __nullable)launchViewOnWindow {
+    
+    XMNLaunchView *view = [[UIApplication sharedApplication].keyWindow viewWithTag:kXMNLaunchViewTag];
+    if ([view isKindOfClass:[XMNLaunchView class]]) {
+        return view;
+    }
+    return nil;
+}
 @end

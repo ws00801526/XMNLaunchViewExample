@@ -14,7 +14,6 @@
 		97C03C3B1D6AE8D20062C3FB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C03C391D6AE8D20062C3FB /* Main.storyboard */; };
 		97C03C3D1D6AE8D20062C3FB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C03C3C1D6AE8D20062C3FB /* Assets.xcassets */; };
 		97C03C401D6AE8D20062C3FB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C03C3E1D6AE8D20062C3FB /* LaunchScreen.storyboard */; };
-		97C03C491D6AE8F50062C3FB /* XMNLaunchView.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C481D6AE8F50062C3FB /* XMNLaunchView.m */; };
 		97C03C771D6AEF800062C3FB /* YYCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C511D6AEF800062C3FB /* YYCache.m */; };
 		97C03C781D6AEF800062C3FB /* YYDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C531D6AEF800062C3FB /* YYDiskCache.m */; };
 		97C03C791D6AEF800062C3FB /* YYKVStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C03C551D6AEF800062C3FB /* YYKVStorage.m */; };
@@ -36,6 +35,7 @@
 		97C03C8A1D6AF1A80062C3FB /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C03C891D6AF1A80062C3FB /* libsqlite3.tbd */; };
 		97C03C8C1D6AF1B40062C3FB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97C03C8B1D6AF1B40062C3FB /* libz.tbd */; };
 		97C03C8E1D6B04C30062C3FB /* qidong.gif in Resources */ = {isa = PBXBuildFile; fileRef = 97C03C8D1D6B04C30062C3FB /* qidong.gif */; };
+		97C9A2361DD2C21F00CE72A6 /* XMNLaunchView.m in Sources */ = {isa = PBXBuildFile; fileRef = 97C9A2351DD2C21F00CE72A6 /* XMNLaunchView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,8 +51,6 @@
 		97C03C3C1D6AE8D20062C3FB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C03C3F1D6AE8D20062C3FB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C03C411D6AE8D20062C3FB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		97C03C471D6AE8F50062C3FB /* XMNLaunchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMNLaunchView.h; sourceTree = "<group>"; };
-		97C03C481D6AE8F50062C3FB /* XMNLaunchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMNLaunchView.m; sourceTree = "<group>"; };
 		97C03C501D6AEF800062C3FB /* YYCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYCache.h; sourceTree = "<group>"; };
 		97C03C511D6AEF800062C3FB /* YYCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYCache.m; sourceTree = "<group>"; };
 		97C03C521D6AEF800062C3FB /* YYDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYDiskCache.h; sourceTree = "<group>"; };
@@ -93,6 +91,8 @@
 		97C03C891D6AF1A80062C3FB /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		97C03C8B1D6AF1B40062C3FB /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		97C03C8D1D6B04C30062C3FB /* qidong.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = qidong.gif; sourceTree = "<group>"; };
+		97C9A2341DD2C21F00CE72A6 /* XMNLaunchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMNLaunchView.h; sourceTree = "<group>"; };
+		97C9A2351DD2C21F00CE72A6 /* XMNLaunchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMNLaunchView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,8 +133,8 @@
 				97C03C341D6AE8D20062C3FB /* AppDelegate.m */,
 				97C03C361D6AE8D20062C3FB /* ViewController.h */,
 				97C03C371D6AE8D20062C3FB /* ViewController.m */,
-				97C03C471D6AE8F50062C3FB /* XMNLaunchView.h */,
-				97C03C481D6AE8F50062C3FB /* XMNLaunchView.m */,
+				97C9A2341DD2C21F00CE72A6 /* XMNLaunchView.h */,
+				97C9A2351DD2C21F00CE72A6 /* XMNLaunchView.m */,
 				973B930B1D6C4AF0001C3E68 /* XMNLaunchView.swift */,
 				97C03C8D1D6B04C30062C3FB /* qidong.gif */,
 				97C03C4E1D6AEF800062C3FB /* YYWebImage */,
@@ -317,7 +317,7 @@
 				97C03C781D6AEF800062C3FB /* YYDiskCache.m in Sources */,
 				97C03C881D6AEF800062C3FB /* YYWebImageOperation.m in Sources */,
 				97C03C841D6AEF800062C3FB /* YYImageCoder.m in Sources */,
-				97C03C491D6AE8F50062C3FB /* XMNLaunchView.m in Sources */,
+				97C9A2361DD2C21F00CE72A6 /* XMNLaunchView.m in Sources */,
 				97C03C771D6AEF800062C3FB /* YYCache.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

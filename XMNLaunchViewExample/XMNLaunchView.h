@@ -2,7 +2,7 @@
 //  XMNLaunchView.h
 //  XMNLaunchViewExample
 //
-//  Created by XMFraker on 16/8/22.
+//  Created by XMFraker on 16/11/9.
 //  Copyright © 2016年 XMFraker. All rights reserved.
 //
 
@@ -11,61 +11,83 @@
 
 typedef NS_ENUM(NSUInteger, XMNLaunchViewDismissMode) {
     
-    /** 默认dismissmode, 用户调用dismissLaunchView时*/
     XMNLaunchViewDismissModeDefault = 0,
-    /** 用户点击广告消失 */
     XMNLaunchViewDismissModeTap,
-    /** 用户点击跳转消失 */
-    XMNLaunchViewDismissModeSkip,
-    /** 用户下载图片,获取图片失败时回调 */
-    XMNLaunchViewDismissModeImageFailed,
-    /** 图片显示时间到了 */
-    XMNLaunchViewDismissModeDisplayTimeout,
 };
 
 /**
- *  @brief 启动图后显示的加载页面
- *  可以显示本地图片,网络图片
+ 2.0版本launchView
  */
 @interface XMNLaunchView : UIView
 
-/// ========================================
-/// @name   @warning 修改下列四个属性,会重新加载图片
-/// ========================================
 
-/** 图片展示的时长  默认3s */
-@property (assign, nonatomic) NSTimeInterval imageDisplayInerval;
-
-/** 图片超时时长,如果图片长时间未获取成功,则直接去下此页面  默认10s    */
-@property (assign, nonatomic) NSTimeInterval imageTimeoutInterval;
-
-/** 用户自定义的占位图, 用户未指定,则从launch中读取启动图片*/
+/** 未获取到imageURL链接图片之前显示的默认占位图 */
 @property (strong, nonatomic, nullable) UIImage *placeholder;
+/** 网络图片路径地址 */
+@property (strong, nonatomic, nullable, readonly) NSURL   *imageURL;
 
-/** 显示的图片地址 */
-@property (strong, nonatomic, nullable) NSURL *imageURL;
+/** 图片最大展示时间 默认3.f*/
+@property (assign, nonatomic) NSTimeInterval displayTimeout;
+/** 图片最大请求时间 默认5.f*/
+@property (assign, nonatomic) NSTimeInterval requestTimeout;
 
-/** 回调block */
-@property (copy, nonatomic, nullable)   void(^completedBlock)(XMNLaunchView *__nonnull launchView, XMNLaunchViewDismissMode mode);
+/** 是否自动隐藏launchView
+ * YES 时  当图片加载失败 时会自动dismissLaunchView
+ * 默认为YES */
+@property (assign, nonatomic, getter=isAutoHide) BOOL autoHide;
 
-/** 显示launchView的主window */
-@property (weak, nonatomic, nullable, readonly)   UIWindow *window;
+/** 回调block
+ *
+ *  除了用户手动点击加载的图片会回调此block  其他例如 图片加载失败,显示图片超时,点击图片,点击跳过按钮均不会回调此block
+ *
+ **/
+@property (copy, nonatomic, nullable)   void(^completionBlock)(XMNLaunchView *__nonnull __weak launchView, XMNLaunchViewDismissMode mode);
 
 /**
- *  @brief 指定初始化方法
- *
- *  @param window   显示launchView的主window
- *  @param imageURL 显示的图片地址
- *
- *  @return
+ 获取一个XMNLaunchView实例
+ 
+ @warning 默认XMNLaunchView的大小为[UIApplication shareApplication].keywindow.bounds
+ 如果在didFinishLaunchingWithOptions配置 可能keywindow为nil ,获取不到大小,需要手动指定XMNLaunchView大小
+ @param placeholder 默认占位图
+ @param imageURL    网络图片地址
+ @return XMNLaunchView 实例
  */
-- (instancetype _Nonnull)initWithWindow:(UIWindow * _Nonnull)window
-                               imageURL:(NSURL * _Nullable)imageURL NS_DESIGNATED_INITIALIZER;
+- (instancetype __nonnull)initWithPlaceholder:(UIImage * __nullable)placeholder
+                                     imageURL:(NSURL * __nullable)imageURL;
 
-- (instancetype __nonnull)initWithFrame:(CGRect)frame NS_UNAVAILABLE;
-- (instancetype __nonnull)initWithCoder:(NSCoder * __nonnull)aDecoder NS_UNAVAILABLE;
+/**
+ 展示一个图片地址
+ 
+ @param imageURL       图片网络地址
+ @param requestTimeout 图片最大请求时间
+ @param displayTimeout 图片最大展示时间
+ */
+- (void)launchImageWithURL:(NSURL * _Nullable)imageURL
+            requestTimeout:(NSInteger)requestTimeout
+            displayTimeout:(NSInteger)displayTimeout;
 
-/** 隐藏lanunchView */
+/**
+ 隐藏launchView,手动调用,不会回调launchView.completionBlock
+ */
 - (void)dismissLaunchView;
 
+#pragma mark - Class Method
+
+/**
+ 从启动图中获取当前启动图片
+ 
+ @return 获取到的图片
+ */
++ (UIImage * __nullable)launchImage;
+
+
+/**
+ 获取window上的launchView
+ 
+ @return XMNLaunchView 实例 or nil
+ */
++ (XMNLaunchView * __nullable)launchViewOnWindow;
+
 @end
+
+FOUNDATION_EXPORT NSInteger kXMNLaunchViewTag;

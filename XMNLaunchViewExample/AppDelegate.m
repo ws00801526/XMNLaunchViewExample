@@ -13,8 +13,6 @@
 
 #import "YYWebImage.h"
 
-
-
 #define kTestOCLaunchView  1
 
 
@@ -39,6 +37,8 @@
 //    ViewController *viewC = [[ViewController alloc] init];
 //    viewC.view.backgroundColor = [UIColor redColor];
 //    self.window.rootViewController = viewC;
+
+    [self.window makeKeyAndVisible];
     
     NSURL *imageURL = [NSURL URLWithString:@"http://img4q.duitang.com/uploads/item/201405/31/20140531174231_cA3VQ.jpeg"];
     
@@ -49,7 +49,7 @@
 //    imageURL = [[NSBundle mainBundle] URLForResource:@"qidong" withExtension:@"gif"];
     
     /** gif图片 */
-//    imageURL = [NSURL URLWithString:@"https://d13yacurqjgara.cloudfront.net/users/288987/screenshots/1913272/depressed-slurp-cycle.gif"];
+    imageURL = [NSURL URLWithString:@"https://d13yacurqjgara.cloudfront.net/users/288987/screenshots/1913272/depressed-slurp-cycle.gif"];
     
     /** 测试使用,移除缓存,查看没有缓存下 显示效果 */
     [[YYWebImageManager sharedManager].cache removeImageForKey:[[YYWebImageManager sharedManager] cacheKeyForURL:imageURL]];
@@ -64,17 +64,22 @@
 }
 
 
-
 #if kTestOCLaunchView
 
 - (void)setupLaunchViewOCWithURL:(NSURL *)URL {
     
-    XMNLaunchView *view = [[XMNLaunchView alloc] initWithWindow:self.window
-                                                       imageURL:URL];
+    XMNLaunchView *launchView = [[XMNLaunchView alloc] initWithPlaceholder:[XMNLaunchView launchImage]
+                                                                  imageURL:URL];
     
-    [view setCompletedBlock:^(XMNLaunchView *launchView, XMNLaunchViewDismissMode mode) {
+    /** 修改默认的显示时间 */
+    launchView.displayTimeout = 10.f;
+    [self.window addSubview:launchView];
+    launchView.autoHide = NO;
+    [launchView setCompletionBlock:^(XMNLaunchView *__weak _Nonnull launchView, XMNLaunchViewDismissMode mode) {
         
-        [launchView dismissLaunchView];
+        if (mode == XMNLaunchViewDismissModeTap) {
+            NSLog(@"you tap launchView");
+        }
     }];
 }
 
